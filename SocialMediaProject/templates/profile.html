@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ profile_user.username }} — SocialHub{% endblock %}
+
+{% block content %}
+<div class="profile-layout">
+
+    <!-- Profile Header -->
+    <div class="profile-header-card">
+        <div class="profile-cover"></div>
+        <div class="profile-info">
+            <div class="profile-avatar-wrap">
+                {% if profile.profile_image %}
+                    <img src="{{ profile.profile_image.url }}" alt="avatar" class="profile-avatar-large">
+                {% else %}
+                    <div class="profile-avatar-large profile-avatar-placeholder-large">{{ profile_user.username|first|upper }}</div>
+                {% endif %}
+            </div>
+            <div class="profile-details">
+                <div class="profile-name-row">
+                    <h1 class="profile-display-name">{{ profile_user.username }}</h1>
+                    {% if is_own_profile %}
+                        <a href="{% url 'edit_profile' %}" class="btn-outline">Edit Profile</a>
+                    {% else %}
+                        {% if user.is_authenticated %}
+                        <form action="{% url 'toggle_follow' profile_user.username %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="{% if is_following %}btn-outline{% else %}btn-primary{% endif %}">
+                                {% if is_following %}Unfollow{% else %}Follow{% endif %}
+                            </button>
+                        </form>
+                        {% endif %}
+                    {% endif %}
+                </div>
+                {% if profile_user.first_name or profile_user.last_name %}
+                <p class="profile-fullname">{{ profile_user.first_name }} {{ profile_user.last_name }}</p>
+                {% endif %}
+                {% if profile.bio %}
+                <p class="profile-bio">{{ profile.bio }}</p>
+                {% else %}
+                <p class="profile-bio profile-bio-empty">No bio yet.</p>
+                {% endif %}
+
+                <div class="profile-stats">
+                    <div class="profile-stat">
+                        <span class="profile-stat-num">{{ posts_count }}</span>
+                        <span class="profile-stat-label">Posts</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-num">{{ followers_count }}</span>
+                        <span class="profile-stat-label">Followers</span>
+                    </div>
+                    <div class="profile-stat">
+                        <span class="profile-stat-num">{{ following_count }}</span>
+                        <span class="profile-stat-label">Following</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Posts Grid -->
+    <div class="profile-posts-section">
+        <h2 class="section-title">Posts</h2>
+        {% if posts %}
+        <div class="profile-posts-list">
+            {% for post in posts %}
+            <article class="post-card">
+                <div class="post-header">
+                    <div class="post-author-info">
+                        {% if profile.profile_image %}
+                            <img src="{{ profile.profile_image.url }}" alt="avatar" class="post-avatar">
+                        {% else %}
+                            <div class="post-avatar-placeholder">{{ profile_user.username|first|upper }}</div>
+                        {% endif %}
+                        <div>
+                            <span class="post-username">{{ profile_user.username }}</span>
+                            <span class="post-time">{{ post.timestamp|timesince }} ago</span>
+                        </div>
+                    </div>
+                    {% if is_own_profile %}
+                    <form action="{% url 'delete_post' post.id %}" method="POST" onsubmit="return confirm('Delete?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-delete">🗑</button>
+                    </form>
+                    {% endif %}
+                </div>
+                <div class="post-body">
+                    <p class="post-content">{{ post.content }}</p>
+                    {% if post.image %}
+                    <div class="post-image-wrap">
+                        <img src="{{ post.image.url }}" alt="post image" class="post-image">
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="post-meta-footer">
+                    <span>❤️ {{ post.get_likes_count }} likes</span>
+                    <span>💬 {{ post.get_comments_count }} comments</span>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-feed">
+            <div class="empty-icon">📝</div>
+            <h3>No posts yet</h3>
+            {% if is_own_profile %}
+            <p>Share your first post!</p>
+            <a href="{% url 'create_post' %}" class="btn-primary">Create Post</a>
+            {% else %}
+            <p>{{ profile_user.username }} hasn't posted yet.</p>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

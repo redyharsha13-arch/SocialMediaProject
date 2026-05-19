@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Home — SocialHub{% endblock %}
+
+{% block content %}
+<div class="feed-layout">
+
+    <!-- Left Sidebar -->
+    <aside class="sidebar-left">
+        <div class="sidebar-card">
+            <div class="sidebar-profile">
+                {% if user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}" alt="avatar" class="sidebar-avatar">
+                {% else %}
+                    <div class="sidebar-avatar-placeholder">{{ user.username|first|upper }}</div>
+                {% endif %}
+                <div>
+                    <a href="{% url 'profile' user.username %}" class="sidebar-username">{{ user.username }}</a>
+                    <p class="sidebar-bio">{{ user.profile.bio|default:"No bio yet." }}</p>
+                </div>
+            </div>
+            <div class="sidebar-stats">
+                <div class="stat">
+                    <span class="stat-number">{{ user.posts.count }}</span>
+                    <span class="stat-label">Posts</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">{{ user.profile.get_followers_count }}</span>
+                    <span class="stat-label">Followers</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-number">{{ user.profile.get_following_count }}</span>
+                    <span class="stat-label">Following</span>
+                </div>
+            </div>
+            <a href="{% url 'edit_profile' %}" class="btn-outline btn-full">Edit Profile</a>
+        </div>
+    </aside>
+
+    <!-- Main Feed -->
+    <div class="feed-main">
+        <div class="create-post-teaser">
+            <div class="teaser-inner">
+                {% if user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}" alt="avatar" class="teaser-avatar">
+                {% else %}
+                    <div class="teaser-avatar-placeholder">{{ user.username|first|upper }}</div>
+                {% endif %}
+                <a href="{% url 'create_post' %}" class="teaser-input">What's on your mind, {{ user.username }}?</a>
+            </div>
+            <a href="{% url 'create_post' %}" class="btn-primary">Create Post</a>
+        </div>
+
+        {% if posts_data %}
+            {% for item in posts_data %}
+            <article class="post-card" id="post-{{ item.post.id }}">
+                <div class="post-header">
+                    <div class="post-author-info">
+                        <a href="{% url 'profile' item.post.user.username %}">
+                            {% if item.post.user.profile.profile_image %}
+                                <img src="{{ item.post.user.profile.profile_image.url }}" alt="avatar" class="post-avatar">
+                            {% else %}
+                                <div class="post-avatar-placeholder">{{ item.post.user.username|first|upper }}</div>
+                            {% endif %}
+                        </a>
+                        <div>
+                            <a href="{% url 'profile' item.post.user.username %}" class="post-username">{{ item.post.user.username }}</a>
+                            <span class="post-time">{{ item.post.timestamp|timesince }} ago</span>
+                        </div>
+                    </div>
+                    {% if item.post.user == user %}
+                    <form action="{% url 'delete_post' item.post.id %}" method="POST" onsubmit="return confirm('Delete this post?')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn-delete">🗑</button>
+                    </form>
+                    {% endif %}
+                </div>
+
+                <div class="post-body">
+                    <p class="post-content">{{ item.post.content }}</p>
+                    {% if item.post.image %}
+                    <div class="post-image-wrap">
+                        <img src="{{ item.post.image.url }}" alt="post image" class="post-image">
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="post-actions">
+                    <button class="like-btn {% if item.is_liked %}liked{% endif %}"
+                            data-post-id="{{ item.post.id }}"
+                            onclick="toggleLike({{ item.post.id }}, this)">
+                        <span class="like-icon">{% if item.is_liked %}❤️{% else %}🤍{% endif %}</span>
+                        <span class="like-count" id="like-count-{{ item.post.id }}">{{ item.likes_count }}</span>
+                    </button>
+
+                    <button class="comment-toggle-btn" onclick="toggleComments('comments-{{ item.post.id }}')">
+                        💬 <span>{{ item.comments_count }}</span>
+                    </button>
+                </div>
+
+                <!-- Comments Section -->
+                <div class="comments-section" id="comments-{{ item.post.id }}" style="display:none;">
+                    <div class="comments-list">
+                        {% for comment in item.comments %}
+                        <div class="comment">
+                            <a href="{% url 'profile' comment.user.username %}" class="comment-author">{{ comment.user.username }}</a>
+                            <span class="comment-text">{{ comment.text }}</span>
+                            <span class="comment-time">{{ comment.timestamp|timesince }} ago</span>
+                        </div>
+                        {% empty %}
+                        <p class="no-comments">No comments yet. Be the first!</p>
+                        {% endfor %}
+                    </div>
+
+                    <form action="{% url 'add_comment' item.post.id %}" method="POST" class="comment-form">
+                        {% csrf_token %}
+                        <div class="comment-input-row">
+                            {% if user.profile.profile_image %}
+                                <img src="{{ user.profile.profile_image.url }}" alt="avatar" class="comment-avatar">
+                            {% else %}
+                                <div class="comment-avatar-placeholder">{{ user.username|first|upper }}</div>
+                            {% endif %}
+                            <input type="text" name="text" placeholder="Write a comment..." class="comment-input" required maxlength="500">
+                            <button type="submit" class="comment-submit">Post</button>
+                        </div>
+                    </form>
+                </div>
+            </article>
+            {% endfor %}
+        {% else %}
+            <div class="empty-feed">
+                <div class="empty-icon">📭</div>
+                <h3>No posts yet</h3>
+                <p>Be the first one to share something!</p>
+                <a href="{% url 'create_post' %}" class="btn-primary">Create First Post</a>
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

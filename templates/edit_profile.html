@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Profile — SocialHub{% endblock %}
+
+{% block content %}
+<div class="form-page-layout">
+    <div class="form-card">
+        <div class="form-card-header">
+            <h1 class="form-card-title">Edit Profile</h1>
+            <p class="form-card-sub">Update your personal information</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="profile-img-edit-section">
+                {% if user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}" alt="avatar" class="profile-avatar-large" id="profilePreview">
+                {% else %}
+                    <div class="profile-avatar-large profile-avatar-placeholder-large" id="profilePlaceholder">{{ user.username|first|upper }}</div>
+                    <img src="" alt="" class="profile-avatar-large" id="profilePreview" style="display:none;">
+                {% endif %}
+                <label class="change-photo-btn">
+                    📷 Change Photo
+                    {{ form.profile_image }}
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">First Name</label>
+                <input type="text" name="first_name" value="{{ user.first_name }}" class="form-input" placeholder="First name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Last Name</label>
+                <input type="text" name="last_name" value="{{ user.last_name }}" class="form-input" placeholder="Last name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Bio</label>
+                {{ form.bio }}
+                {% if form.bio.errors %}
+                <span class="form-error">{{ form.bio.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'profile' user.username %}" class="btn-outline">Cancel</a>
+                <button type="submit" class="btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.querySelector('.file-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            const preview = document.getElementById('profilePreview');
+            preview.src = ev.target.result;
+            preview.style.display = 'block';
+            const placeholder = document.getElementById('profilePlaceholder');
+            if (placeholder) placeholder.style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+</script>
+{% endblock %}

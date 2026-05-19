@@ -1,0 +1,84 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}SocialHub{% endblock %}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+
+<!-- ✅ NAVBAR ALWAYS VISIBLE -->
+<nav class="navbar">
+    <div class="nav-container">
+        
+        <a href="{% url 'home' %}" class="nav-logo">SocialHub</a>
+
+        <!-- Search only when logged in -->
+        {% if user.is_authenticated %}
+        <div class="nav-search">
+            <form action="{% url 'search' %}" method="GET">
+                <input type="text" name="q" placeholder="Search users..." class="search-bar" value="{{ request.GET.q }}">
+            </form>
+        </div>
+        {% endif %}
+
+        <div class="nav-links">
+
+            {% if user.is_authenticated %}
+
+                <a href="{% url 'home' %}" class="nav-link">
+                    🏠 Home
+                </a>
+
+                <a href="{% url 'create_post' %}" class="nav-link btn-create">
+                    ✏️ Post
+                </a>
+
+                <a href="{% url 'profile' request.user.username %}" class="nav-link nav-profile">
+                    {% if user.profile.profile_image %}
+                        <img src="{{ user.profile.profile_image.url }}" alt="profile" class="nav-avatar">
+                    {% else %}
+                        <div class="nav-avatar-placeholder">
+                            {{ user.username|first|upper }}
+                        </div>
+                    {% endif %}
+                    {{ user.username }}
+                </a>
+
+                <a href="{% url 'logout' %}" class="nav-link nav-logout">Logout</a>
+
+            {% else %}
+
+                <!-- ✅ SHOW THIS WHEN LOGGED OUT -->
+                <a href="{% url 'login' %}" class="nav-link">Login</a>
+                <a href="{% url 'signup' %}" class="nav-link btn-create">Signup</a>
+
+            {% endif %}
+
+        </div>
+    </div>
+</nav>
+
+<!-- Messages -->
+<div class="messages-container">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+        <span class="alert-close" onclick="this.parentElement.remove()">✕</span>
+    </div>
+    {% endfor %}
+</div>
+
+<main class="main-content">
+    {% block content %}{% endblock %}
+</main>
+
+<script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>

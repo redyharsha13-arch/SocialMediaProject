@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Post — SocialHub{% endblock %}
+
+{% block content %}
+<div class="form-page-layout">
+    <div class="form-card">
+        <div class="form-card-header">
+            <h1 class="form-card-title">Create a Post</h1>
+            <p class="form-card-sub">Share something with the world</p>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data" class="post-form">
+            {% csrf_token %}
+            <div class="post-author-row">
+                {% if user.profile.profile_image %}
+                    <img src="{{ user.profile.profile_image.url }}" alt="avatar" class="post-avatar">
+                {% else %}
+                    <div class="post-avatar-placeholder">{{ user.username|first|upper }}</div>
+                {% endif %}
+                <span class="post-form-username">{{ user.username }}</span>
+            </div>
+
+            <div class="form-group">
+                {{ form.content }}
+                {% if form.content.errors %}
+                <span class="form-error">{{ form.content.errors.0 }}</span>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">📷 Add Photo (optional)</label>
+                <div class="file-upload-area" id="fileUploadArea">
+                    <div class="file-upload-icon">🖼️</div>
+                    <p>Click to upload or drag and drop</p>
+                    <p class="file-hint">PNG, JPG, GIF up to 10MB</p>
+                    {{ form.image }}
+                </div>
+                <div id="imagePreview" class="image-preview-container" style="display:none;">
+                    <img id="previewImg" src="" alt="preview" class="image-preview">
+                    <button type="button" onclick="clearImage()" class="clear-image-btn">✕ Remove</button>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="{% url 'home' %}" class="btn-outline">Cancel</a>
+                <button type="submit" class="btn-primary btn-lg">Publish Post</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.querySelector('.file-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            document.getElementById('previewImg').src = ev.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+            document.getElementById('fileUploadArea').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+function clearImage() {
+    document.querySelector('.file-input').value = '';
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('fileUploadArea').style.display = 'flex';
+}
+</script>
+{% endblock %}
