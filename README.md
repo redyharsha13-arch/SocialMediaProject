@@ -1,127 +1,133 @@
 # 🌐 SocialHub — Django Social Media Platform
 
-A fully-featured social media web application built with Django, SQLite, and custom CSS (no external frameworks).
+A fully-featured social media web application built with Django, SQLite, and Bootstrap-free custom CSS.
 
 ---
 
 ## 🚀 Quick Start
 
 ### 1. Clone / Download the project
+```bash
 cd SocialMediaProject
+```
 
 ### 2. (Optional) Create a virtual environment
+```bash
 python -m venv venv
-
-Activate:
-- Linux/Mac: source venv/bin/activate
-- Windows: venv\Scripts\activate
+source venv/bin/activate       # Linux/Mac
+venv\Scripts\activate          # Windows
+```
 
 ### 3. Install dependencies
+```bash
 pip install -r requirements.txt
+```
 
 ### 4. Run database migrations
+```bash
 python manage.py migrate
+```
 
-### 5. Start the development server
-python manage.py runserver
-
-### 6. Open in browser
-http://127.0.0.1:8000/
-
----
-
-## 🔐 Demo Login (Recommended)
-
-Use this account to explore the application instantly:
-
-Username: demo  
-Password: demo123  
-
-Or create a new account using the Signup option.
-
----
-
-## 🧭 How to Use
-
-1. Open the homepage  
-2. Click Login or Signup  
-3. Create and view posts  
-4. Like, comment, and follow users  
-5. Visit user profiles  
-
----
-
-## ⚙️ Admin Panel (Optional)
-
-Create admin user:
+### 5. (Optional) Create a superuser for admin panel
+```bash
 python manage.py createsuperuser
+```
 
-Open:
-http://127.0.0.1:8000/admin/
+### 6. Start the development server
+```bash
+python manage.py runserver
+```
+
+### 7. Open in browser
+```
+http://127.0.0.1:8000/
+```
+
+**Admin Panel:** `http://127.0.0.1:8000/admin/`
 
 ---
+## Troubleshooting
+
+If CSS/styling does not load correctly in Chrome due to cached static files:
+
+- Hard refresh: `Ctrl + Shift + R`
+- Or clear browser cache / site data
+- If needed, try opening once in Incognito mode
 
 ## 🎯 Features
 
-- User Authentication (Signup, Login, Logout)
-- User Profiles (bio, profile photo, followers/following)
-- Create Posts (with optional images)
-- Global Feed
-- Like/Unlike system (AJAX)
-- Comments
-- Follow/Unfollow users
-- Search users
-- Admin panel
+| Feature | Description |
+|---|---|
+| **User Auth** | Signup, Login, Logout |
+| **Profiles** | Bio, profile photo, followers/following counts |
+| **Posts** | Create text posts with optional image upload |
+| **Feed** | Global home feed with all posts |
+| **Likes** | Like/unlike posts (AJAX, no page reload) |
+| **Comments** | Add comments under posts |
+| **Follow** | Follow/unfollow other users |
+| **Search** | Search users by username |
+| **Admin** | Full Django admin panel at /admin/ |
 
 ---
 
 ## 🗄️ Database Models
 
-- User (Django built-in)
-- Profile (One-to-one with user)
-- Post (content, image, timestamp)
-- Comment (linked to user & post)
-- Like (user-post relation)
-- Follow (follower-following relation)
+- **User** — Django's built-in auth user
+- **Profile** — bio, profile image (OneToOne with User)
+- **Post** — content, optional image, timestamp
+- **Comment** — text, linked to user + post
+- **Like** — unique user + post pair
+- **Follow** — follower + following user pair
 
 ---
 
 ## 📁 Project Structure
 
+```
 SocialMediaProject/
 ├── manage.py
-├── db.sqlite3
+├── db.sqlite3              ← Created after migrations
 ├── requirements.txt
-├── SocialMediaProject/
-├── app/
-├── templates/
+├── SocialMediaProject/     ← Django project config
+│   ├── settings.py
+│   ├── urls.py
+│   └── wsgi.py
+├── app/                    ← Main application
+│   ├── models.py
+│   ├── views.py
+│   ├── urls.py
+│   ├── forms.py
+│   └── admin.py
+├── templates/              ← HTML templates
+│   ├── base.html
+│   ├── home.html
+│   ├── login.html
+│   ├── signup.html
+│   ├── profile.html
+│   ├── edit_profile.html
+│   ├── create_post.html
+│   └── search.html
 ├── static/
-└── media/
+│   ├── css/style.css
+│   └── js/main.js
+└── media/                  ← Uploaded images (auto-created)
+```
 
 ---
 
 ## 🛠️ Tech Stack
 
-- Backend: Django (Python)
-- Database: SQLite
-- Frontend: HTML, CSS, JavaScript
-- Templates: Django Templates
+- **Backend:** Python 3.x + Django 4.x
+- **Database:** SQLite (db.sqlite3)
+- **Frontend:** HTML5, CSS3, Vanilla JavaScript
+- **Templating:** Django Templates (server-side rendering)
+- **Images:** Pillow (for image uploads)
 
 ---
 
 ## 📝 Notes
 
-- Login & Signup available on homepage  
-- Demo data may be included  
-- Media files stored in `media/`  
-- Uses Django authentication system  
-- No external CSS frameworks  
-- AJAX used for like feature  
-
----
-
-## ✅ Project Status
-
-✔ Fully functional  
-✔ Clean UI  
-✔ Ready for submission  
+- All uploaded media (profile/post images) are saved to the `media/` folder
+- The project uses Django's built-in authentication system
+- No external CSS frameworks — all styles are custom
+- AJAX is used for like toggle (no page reload)
