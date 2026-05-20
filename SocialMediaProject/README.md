@@ -46,6 +46,13 @@ http://127.0.0.1:8000/
 **Admin Panel:** `http://127.0.0.1:8000/admin/`
 
 ---
+## Troubleshooting
+
+If CSS/styling does not load correctly in Chrome due to cached static files:
+
+- Hard refresh: `Ctrl + Shift + R`
+- Or clear browser cache / site data
+- If needed, try opening once in Incognito mode
 
 ## 🎯 Features
 
